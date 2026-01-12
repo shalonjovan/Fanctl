@@ -1,4 +1,3 @@
-
 def read_int(path: str) -> int:
     try:
         with open(path, "r") as f:

@@ -1,5 +1,3 @@
-# asus_fanctl/hwmon/sensors.py
-
 import os
 from asus_fanctl.hwmon.resolver import find_hwmon
 from asus_fanctl.utils.fs import read_int
