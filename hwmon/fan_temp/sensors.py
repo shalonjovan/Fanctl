@@ -9,6 +9,50 @@ def _read_milli(path: str) -> float:
     return read_int(path) / 1000.0
 
 
+
+# -------- CPU TEMPERATURES --------
+
+def get_cpu_temps() -> dict:
+    """
+    Returns:
+    {
+        "package": float,
+        "cores": {
+            core_id: float
+        }
+    }
+    """
+    coretemp = find_hwmon_by_name("coretemp")
+
+    package_temp = None
+    cores = {}
+
+    for fname in os.listdir(coretemp):
+        if not fname.startswith("temp") or not fname.endswith("_label"):
+            continue
+
+        idx = fname.replace("temp", "").replace("_label", "")
+        label = read_str(f"{coretemp}/{fname}")
+
+        # CPU package
+        if label == "Package id 0":
+            package_temp = _read_milli(
+                f"{coretemp}/temp{idx}_input"
+            )
+
+        # CPU cores
+        elif label.startswith("Core"):
+            core_id = int(label.replace("Core", "").strip())
+            cores[core_id] = _read_milli(
+                f"{coretemp}/temp{idx}_input"
+            )
+
+    return {
+        "package": package_temp,
+        "cores": dict(sorted(cores.items()))
+    }
+
+
 # -------- BATTERY --------
 
 def get_battery_info() -> dict:
