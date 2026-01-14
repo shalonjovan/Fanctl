@@ -1,22 +1,25 @@
 # hwmon/main.py
 
-from hwmon.model.system import get_system_info
-from hwmon.model.cpu_info import get_cpu_info
-from hwmon.utils.proc import parse_meminfo
-import pprint
+from hwmon.model.info import (
+    get_system_product_name,
+    get_cpu_info,
+    get_total_ram_mb,
+)
 
 
 def main():
-    print("SYSTEM INFO")
-    pprint.pprint(get_system_info())
+    print("System:")
+    print("  Product:", get_system_product_name())
 
-    print("\nCPU INFO")
-    pprint.pprint(get_cpu_info())
+    cpu = get_cpu_info()
+    print("\nCPU:")
+    print("  Model:", cpu["model_name"])
+    print("  Arch:", cpu["architecture"])
+    print("  Cores:", cpu["cores"])
+    print("  Threads:", cpu["processors"])
 
-    print("\nMEMORY INFO (raw)")
-    mem = parse_meminfo()
-    for k in ("MemTotal", "MemAvailable", "SwapTotal", "SwapFree"):
-        print(f"{k}: {mem[k]} kB")
+    print("\nMemory:")
+    print("  Total RAM:", get_total_ram_mb(), "MB")
 
 
 if __name__ == "__main__":
