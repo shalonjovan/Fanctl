@@ -5,18 +5,14 @@ from hwmon.utils.proc import parse_cpuinfo, parse_meminfo
 # ---------- SYSTEM ----------
 
 def get_system_product_name() -> str:
-    """
-    Returns the system product name (e.g. ROG Strix G16).
-    """
+   
     return read_str("/sys/class/dmi/id/product_name")
 
 
 # ---------- CPU ----------
 
 def get_cpu_info() -> dict:
-    """
-    Returns essential CPU identity info.
-    """
+    
     cpu = parse_cpuinfo()
 
     return {
@@ -30,8 +26,6 @@ def get_cpu_info() -> dict:
 # ---------- MEMORY ----------
 
 def get_total_ram_mb() -> int:
-    """
-    Returns total system RAM in MB.
-    """
+ 
     mem = parse_meminfo()
     return mem.get("MemTotal", 0) // 1024

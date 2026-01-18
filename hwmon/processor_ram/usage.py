@@ -5,11 +5,7 @@ from hwmon.utils.proc import parse_meminfo
 # ---------- CPU USAGE ----------
 
 def _read_cpu_line() -> list[int]:
-    """
-    Returns cpu counters from /proc/stat 'cpu ' line.
-    Order:
-    user, nice, system, idle, iowait, irq, softirq, steal
-    """
+  
     with open("/proc/stat", "r") as f:
         for line in f:
             if line.startswith("cpu "):
@@ -19,9 +15,7 @@ def _read_cpu_line() -> list[int]:
 
 
 def get_cpu_usage_percent(interval: float = 1.0) -> float:
-    """
-    Returns total CPU usage percentage over `interval` seconds.
-    """
+   
     a = _read_cpu_line()
     time.sleep(interval)
     b = _read_cpu_line()
@@ -45,15 +39,7 @@ def get_cpu_usage_percent(interval: float = 1.0) -> float:
 # ---------- MEMORY USAGE ----------
 
 def get_mem_usage() -> dict:
-    """
-    Returns:
-    {
-        total_mb,
-        used_mb,
-        available_mb,
-        percent_used
-    }
-    """
+
     mem = parse_meminfo()
 
     total = mem["MemTotal"]

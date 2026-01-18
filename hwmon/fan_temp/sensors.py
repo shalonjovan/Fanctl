@@ -34,13 +34,11 @@ def get_cpu_temps() -> dict:
         idx = fname.replace("temp", "").replace("_label", "")
         label = read_str(f"{coretemp}/{fname}")
 
-        # CPU package
         if label == "Package id 0":
             package_temp = _read_milli(
                 f"{coretemp}/temp{idx}_input"
             )
 
-        # CPU cores
         elif label.startswith("Core"):
             core_id = int(label.replace("Core", "").strip())
             cores[core_id] = _read_milli(
@@ -56,14 +54,7 @@ def get_cpu_temps() -> dict:
 # -------- BATTERY --------
 
 def get_battery_info() -> dict:
-    """
-    Returns:
-    {
-        voltage: volts,
-        power: watts,
-        remaining: 0.0 - 1.0
-    }
-    """
+ 
     bat = find_hwmon_by_name("BAT0")
 
     voltage = read_int(f"{bat}/in0_input") / 1000.0

@@ -20,9 +20,7 @@ from hwmon.processor_ram.usage import (
 
 
 def get_system_state(interval: float = 1.0) -> dict:
-    """
-    Returns a full snapshot of system state.
-    """
+  
     cpu_info = get_cpu_info()
     mem_usage = get_mem_usage()
 
