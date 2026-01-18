@@ -26,12 +26,11 @@ class HwmonTUI(App):
     # ---------------- lifecycle ----------------
 
     def on_mount(self):
-        # Apply curves ONCE
         apply_profile("cpu")
         apply_profile("gpu")
         apply_profile("mid")
 
-        # Start refresh timer
+
         self.set_interval(1, self.refresh_state)
 
     # ---------------- layout ----------------
@@ -66,7 +65,6 @@ class HwmonTUI(App):
     def refresh_state(self):
         state = get_system_state()
 
-        # -------- SYSTEM INFO --------
         self.system_info.update(
             f"""
 [b]{state['system']['product_name']}[/b]
@@ -83,7 +81,7 @@ NVMe:
             )
         )
 
-        # -------- FANS --------
+
         fan_ascii = load_ascii("fan.txt")
         fans_text = fan_ascii + "\n\n"
 
@@ -95,7 +93,7 @@ NVMe:
 
         self.fans.update(fans_text.strip())
 
-        # -------- CPU + MEMORY --------
+
         cpu = state["cpu"]
         mem = state["memory"]
 

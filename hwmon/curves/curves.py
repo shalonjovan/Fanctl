@@ -16,9 +16,7 @@ _CURVES_JSON = os.path.join(
 # ---------- low-level write ----------
 
 def _write_sysfs(path: str, value: int):
-    """
-    Write to sysfs using tee (EC-safe).
-    """
+   
     cmd = f"echo {value} | tee {path} > /dev/null"
     result = subprocess.run(cmd, shell=True)
 
@@ -55,9 +53,7 @@ def write_curve_point(fan: int, point: int, temp_c: int, pwm: int):
 
 
 def apply_curve(fan: int, points: list[list[int]]):
-    """
-    Apply curve safely (EC ordering).
-    """
+   
     for idx, (temp, pwm) in enumerate(points, start=1):
         write_curve_point(fan, idx, temp, pwm)
 
@@ -73,9 +69,7 @@ def load_profiles() -> dict:
 
 
 def apply_profile(name: str):
-    """
-    Apply a named curve profile (cpu / gpu / mid).
-    """
+  
     profiles = load_profiles()
 
     if name not in profiles:

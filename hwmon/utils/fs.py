@@ -14,9 +14,7 @@ def read_int(path: str) -> int:
 
 
 def read_kv_dir(base: str) -> dict:
-    """
-    Reads a directory of files into {filename: value}
-    """
+    
     import os
     data = {}
     for name in os.listdir(base):
