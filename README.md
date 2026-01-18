@@ -11,7 +11,7 @@ It has been tested only on my machine and may not function correctly on other sy
 
 ## Screenshot
 
-![hwmon screenshot](hwmon/screenshot/1.png)
+![hwmon screenshot](screenshot/1.png)
 
 ---
 
