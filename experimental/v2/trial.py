@@ -8,3 +8,6 @@ try:
             print('  %s: %.2f' % (feature.label, feature.get_value()))
 finally:
     sensors.cleanup()
+
+
+    
