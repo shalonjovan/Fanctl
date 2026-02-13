@@ -5,7 +5,6 @@ from typing import Dict, Any
 import psutil
 import sensors
 
-# NVML is optional; tool still works without NVIDIA GPU
 try:
     import pynvml
     pynvml.nvmlInit()
@@ -42,43 +41,50 @@ class SystemState:
             "percent_used": mem.percent,
         }
 
-    # Centralized sensor parsing using pysensors
+    # Uses numeric feature.type (stable across pysensors versions)
     def _parse_sensors(self):
         cpu_temp = None
         nvme_temps = {}
         fans = {}
-        battery = {}
+        batteries = []
         misc_temps = {}
 
         for chip in sensors.iter_detected_chips():
             chip_name = str(chip).lower()
+            battery_data = {}
 
             for feature in chip:
                 label = feature.label
                 value = feature.get_value()
+                ftype = feature.type
 
-                if "coretemp" in chip_name:
-                    if label == "Package id 0":
+                # 2 = temperature
+                if ftype == 2:
+                    if "package" in label.lower():
                         cpu_temp = value
-                    elif label.startswith("Core"):
+                    elif "nvme" in chip_name:
+                        nvme_temps[f"{chip_name}:{label}"] = value
+                    else:
                         misc_temps[label] = value
 
-                elif "nvme" in chip_name:
-                    nvme_temps[label] = value
-
-                elif "asus" in chip_name and "fan" in label:
+                # 1 = fan
+                elif ftype == 1:
                     fans[label] = int(value)
 
-                elif "bat" in chip_name:
-                    if label.startswith("in"):
-                        battery["voltage"] = round(value, 2)
-                    elif label.startswith("power"):
-                        battery["power"] = round(value, 2)
+                # 0 = voltage input
+                elif ftype == 0:
+                    if "bat" in chip_name:
+                        battery_data["voltage"] = round(value, 2)
 
-                elif "acpi" in chip_name:
-                    misc_temps[label] = value
+                # 3 = power
+                elif ftype == 3:
+                    if "bat" in chip_name:
+                        battery_data["power"] = round(value, 2)
 
-        return cpu_temp, nvme_temps, fans, battery, misc_temps
+            if battery_data:
+                batteries.append(battery_data)
+
+        return cpu_temp, nvme_temps, fans, batteries, misc_temps
 
     def gpu(self) -> Dict[str, Any]:
         if not NVML_AVAILABLE:
@@ -108,9 +114,8 @@ class SystemState:
 
         return gpus
 
-    # Single snapshot used by the TUI layer
     def snapshot(self) -> Dict[str, Any]:
-        cpu_temp, nvme_temps, fans, battery, misc_temps = self._parse_sensors()
+        cpu_temp, nvme_temps, fans, batteries, misc_temps = self._parse_sensors()
 
         return {
             "timestamp": time.time(),
@@ -124,7 +129,7 @@ class SystemState:
             "memory": self.memory(),
             "nvme": nvme_temps,
             "fans": fans,
-            "battery": battery,
+            "batteries": batteries,
             "misc_temps": misc_temps,
             "gpu": self.gpu(),
         }
