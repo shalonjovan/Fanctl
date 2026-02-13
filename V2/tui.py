@@ -38,30 +38,27 @@ class HwmonTUI(App):
 
         yield Vertical(
             Horizontal(left, right),
-            Static("Monitoring with pysensors + psutil + nvml", id="footer")
+            Static("Hardware Monitor (pysensors + psutil + nvml)", id="footer")
         )
 
-    # UI layer only formats snapshot data
+    # Pure formatting layer
     def refresh_state(self):
         state = self.state.snapshot()
-
-        battery = state["battery"]
-        nvme = state["nvme"]
 
         left_text = f"""
 [b]{state['system']['product_name']}[/b]
 """
 
-        if battery:
+        for idx, battery in enumerate(state["batteries"], 1):
             left_text += f"""
-Battery:
+Battery {idx}:
   {battery.get('voltage', 0)} V
   {battery.get('power', 0)} W
 """
 
-        if nvme:
+        if state["nvme"]:
             left_text += "\nNVMe:\n"
-            for label, temp in nvme.items():
+            for label, temp in state["nvme"].items():
                 left_text += f"  {label}: {temp:.1f}°C\n"
 
         self.system_info.update(left_text.strip())
@@ -71,7 +68,7 @@ Battery:
 
         right_text = f"""
 CPU
-  Temp: {cpu.get('temp', 0):.1f}°C
+  Temp: {cpu.get('temp', 0) or 0:.1f}°C
   Usage: {cpu['usage_percent']}%
   [{bar(cpu['usage_percent'], 100)}]
 
